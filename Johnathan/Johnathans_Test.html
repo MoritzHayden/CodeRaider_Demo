@@ -2,8 +2,8 @@
 <html>
   <head>
     <meta charset = "utf-8">
-    <meta name = "template" content = "width=device_width">
-    <title>Goonsquadv2</title>
+    <meta name = "viewport" content = "width=device_width">
+    <title>Johnathan's Demo</title>
 
     <style>
       *{margin:0; padding:0;}
@@ -28,16 +28,11 @@
 
         //global vars can go here, this is the canvas that we write everything to
         var context = document.querySelector("canvas").getContext("2d");
-        var current_mouse_pos = "0,0";
         context.canvas.height = 640;
         context.canvas.width = 640;
         //if you comment this out, sprite images look like shit
         context.imageSmoothingEnabled = false;
         context.canvas.font = "30px Arial";
-
-        context.canvas.addEventListener('mousemove', function(evt) {
-          current_mouse_pos = getMousePos(context.canvas, evt);
-        });
 
 
         //TILEMAP VARS AND FUNCTIONS
@@ -47,41 +42,19 @@
 
         //PLAYER OBJECT
         var player = {
-          height:64,
-          width:46,
+          height:scaled_size,
+          width:scaled_size,
           jumping:true,
           x:70,
           oldx:70,
           x_velocity:0,
-          y:100,
+          y:600,
           oldy:600,
           y_velocity:0,
 
           drawPlayer:function(x, y){
-            if(player.jumping){
-            context.drawImage(char_sheet,player.width*7,0,player.width,player.height,x,y,scaled_size,scaled_size);
-            }
-            else{
-              //IF PLAYER IS (MOSTLY) STANDING STILL
-              if(player.x_velocity < 1 && player.x_velocity> -1){
-              context.drawImage(char_sheet,player.width*0,0,player.width,player.height,x,y,scaled_size,scaled_size);
-              }
-              //IF PLAYER IS MOVING TO THE RIGHT
-              else if (player.x_velocity > 0) {
-                  if(loopcount>0 && loopcount<33){
-                    context.drawImage(char_sheet,player.width*4,0,player.width,player.height,x,y,scaled_size,scaled_size);
-                  }
-                  else if (loopcount>33 && loopcount<66) {
-                    context.drawImage(char_sheet,player.width*5,0,player.width,player.height,x,y,scaled_size,scaled_size);
-                  }
-                  else if (loopcount>66 && loopcount<99) {
-                    context.drawImage(char_sheet,player.width*6,0,player.width,player.height,x,y,scaled_size,scaled_size);
-                  }
-              }
-              else if (player.x_velocity < 0) {
-              context.drawImage(char_sheet,player.width*6,0,player.width,player.height,x,y,scaled_size,scaled_size);
-              }
-            }
+            context.drawImage(tile_sheet,sprite_size*11,0,sprite_size,sprite_size,x,y,scaled_size,scaled_size);
+
           }
         };
         //CONTROLLER VARS AND FUNCTIONS
@@ -113,18 +86,18 @@
         //TILEMAP OBJECT
         var tilemap = {
           rows: 10,
-          columns:10,
+          columns:30,
 
-              map:[3,3,3,3,3,3,3,3,3,3,
-                   2,2,2,2,2,2,2,2,2,2,
-                   2,2,2,2,2,2,2,2,2,2,
-                   2,2,2,2,2,2,2,2,2,2,
-                   2,2,2,2,2,2,2,2,2,2,
-                   2,2,2,2,2,2,2,2,2,2,
-                   2,2,2,2,2,2,2,2,2,2,
-                   2,2,2,2,2,2,2,2,2,2,
-                   1,1,1,1,1,1,1,1,1,1,
-                   0,0,0,0,0,0,0,0,0,0]
+          map:    [10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+		   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                   6,6,6,6,6,9,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,9,6,6,6,
+                   6,6,6,6,6,6,6,7,8,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                   1,1,1,4,1,1,1,2,3,1,5,1,1,1,1,1,4,1,1,1,5,1,1,1,1,1,1,1,1,1,
+                   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         };
 
         //GENERIC COLLISION FUNCTION THAT I LOVE. Takes input of two objects and
@@ -138,64 +111,30 @@
             }
         };
 
-
-        getMousePos = function(canvas, evt){
-          var rect = canvas.getBoundingClientRect();
-          var xmouse = Math.round(evt.clientX - rect.left);
-          var ymouse = Math.round(evt.clientY - rect.top);
-          return xmouse + "," + ymouse;
-        };
-
-        //IMPORTANT!!!! USE THIS SHIT TO SWITCH ANIMATIONS
-        var loopcount = 0;
-
         function loop(){
-          if(loopcount> 100){
-            loopcount =1;
-          }
-
-          loopcount +=4.5;
           var height = context.canvas.height;
           var width = context.canvas.width;
-
+		context.save();
 
 
           //draw background, make the resolution based off of the browser window
           context.fillStyle = "#2e4263";
           context.fillRect(0,0,width,height);
 
-          context.drawImage(title_sheet,0,0,width, height);
-
-          //draw some clickable buttons
-          //context.drawImage(buttons_sheet,95,317);
-          //draw a single button that you can touch
-          context.drawImage(buttons_sheet,0,0,42,14,400,320,84,28);
-
-          //if the player hits the start button, go to Jonathans code
-          if(collision(player.x, player.y, player.width, player.height,
-                       400, 320, 84, 28)){
-              window.location.href = '../Johnathan/Johnathans_Test.html';
-
-          };
-
           //TILEMAP BACKGROUND
-          /*
           for(let x = 0; x <tilemap.columns; x++){
             for(let y=0; y<tilemap.rows; y++){
               //gets the array position of the current tile to write
               let value = tilemap.map[y*tilemap.columns +x];
-              let tilex = x*scaled_size;
+	      let tilex = x*scaled_size-(player.x);
               let tiley = y*scaled_size;
 
-              //only print the floor
-              if(value == 0){
               context.drawImage(tile_sheet, sprite_size*value,0,sprite_size,sprite_size,
                 tilex,tiley,scaled_size,scaled_size);
-              }
             }
           }
 
-          */
+
 
           //now that we have background, lets write our stupid terrible sprite to it
           //how to draw from tilemap: https://www.w3schools.com/tags/canvas_drawimage.asp
@@ -205,7 +144,6 @@
           //context.drawImage(tile_sheet,sprite_size*4,0,sprite_size,sprite_size,canvas_x0,canvas_y0,scaled_size,scaled_size);
 
           //after initializing everything, allow for input from user via listeners
-          //STARTS THE JUMP
           if(controller.up && player.jumping == false){
             player.y_velocity -= 40;
             player.jumping = true;
@@ -246,24 +184,35 @@
             player.jumping = true;
           }
 
-          //Screen collision on the left
-          if(player.x < 0){
-            player.x = 1;
+          //this almost works, stops you from going left through the bricks
+	  if(player.x_velocity<0 && ((tilenumb==0)||(tilenumb>9))){
+            player.x = player.oldx;
+            player.y = player.oldy;
+            player.x_velocity = 0;
           }
-          //Screen collision on the right
-          if(player.x + player.width > context.canvas.width){
-            player.x = context.canvas.width -1 - player.width;
+          //if moving to the right, find tilenumb+1
+          var rtilenumb = tilemap.map[playercelly*tilemap.columns +playercellx+1];
+		if(player.x_velocity>0 &&  ((rtilenumb==0)||(rtilenumb>9))){
+            player.x = player.oldx;
+            player.y = player.oldy;
+            player.x_velocity = 0;
           }
-
           //now do y direction. May need to wrap this around x
-          //for moving down THIS SHIT BROKEN, making the player stick to floor
+          //for moving down
           var btilenumb = tilemap.map[(playercelly+1)*tilemap.columns +playercellx];
           if(player.jumping ==true && player.y_velocity>0 &&   ((btilenumb==0)||(btilenumb>9))){
             player.jumping = false;
-            player.y = height - player.height - scaled_size;
+            player.x = player.oldx;
+            player.y = player.oldy;
             player.y_velocity =0;
           }
-
+          //for moving up
+          var toptilenumb = tilemap.map[(playercelly-1)*tilemap.columns +playercellx];
+          if(player.y_velocity>0 &&   ((btilenumb==0)||(btilenumb>9)) && player.jumping){
+            player.x = player.oldx;
+            player.y = player.oldy;
+            player.y_velocity =0;
+          }
 
           //add static collision detection for the floor
           if(player.y + player.height > height){
@@ -275,8 +224,6 @@
 
           context.fillText(current_cell, scaled_size,scaled_size+10);
 
-          //print current mouse position
-          context.fillText(current_mouse_pos, scaled_size,scaled_size+20);
 
           //draw the player at the end of the physics calculations
           player.drawPlayer(player.x, player.y);
@@ -289,9 +236,6 @@
         //dont call the loop until the assets are loaded. This is trivial while
         //spritesheet is small, but when its bigger, this will matter
         var tile_sheet = new Image();
-        var char_sheet = new Image();
-        var title_sheet = new Image();
-        var buttons_sheet = new Image();
         //adding an event listener to the tile_sheet object. takes an event and then
         //executes an action => defines custom event right here
         tile_sheet.addEventListener("load", (event) => {
@@ -301,11 +245,8 @@
         });
         //BEGIN OF ACTUAL CODE. It runs this first and the listener does things
         //once the assests are loaded
-        tile_sheet.src = "sean_tiles.png";
-        char_sheet.src = "../Connor/Player.png";
-        title_sheet.src = '../Connor/thefix.png';
-        buttons_sheet.src = '../Connor/buttons.png';
-
+        tile_sheet.src = "All_Sprites.png";
+	//camera.follow(player,canvas.width/3,canvas.height);
       </script>
 
   </body>
